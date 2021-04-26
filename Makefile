@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Werror -Isrc -O2 -pie -s
+CFLAGS = -Wall -Werror -Werror=unused-result -Isrc -O2 -pie -s
 LIBS = -lconfig
 
 TARGET = kbd-backlight
