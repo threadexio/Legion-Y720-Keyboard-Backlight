@@ -1,6 +1,6 @@
 # Legion-Y720-Keyboard-Backlight
 ![GitHub](https://img.shields.io/github/license/threadexio/Legion-Y720-Keyboard-Backlight?style=for-the-badge)
-![Travis (.org)](https://img.shields.io/travis/threadexio/Legion-Y720-Keyboard-Backlight?style=for-the-badge)
+![Travis (.com)](https://img.shields.io/travis/com/threadexio/Legion-Y720-Keyboard-Backlight?style=for-the-badge)
 
 Simple C program to control the keyboard backlight on the Lenovo Legion Y720 (should probably work on other laptops with the same keyboard)
 
