@@ -3,7 +3,7 @@ sudo: required
 language: c
 
 before_install:
-  - sudo make deps
+  - sudo apt-get install -y libconfig-dev
 
 script:
   - sudo make install
