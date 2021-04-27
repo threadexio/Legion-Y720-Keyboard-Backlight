@@ -1,0 +1,11 @@
+[Unit]
+Description=Keyboard Backlight
+After=display-manager.service
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/bin/kbd-backlight default
+
+[Install]
+WantedBy=multi-user.target
