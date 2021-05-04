@@ -5,8 +5,6 @@
 
 #define SEGNO 4
 
-typedef unsigned char byte;
-
 const char *colors[] = {
 	"CRIMSON",
 	"TORCH_RED",
@@ -46,10 +44,3 @@ const char *modes[] = {
 	"ALWAYS_ON",
 	"WAVE",
 };
-
-typedef struct {
-	int index;
-    int mode;
-    int color;
-    int bright;
-} Segment_Conf;

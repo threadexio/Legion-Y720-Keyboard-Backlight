@@ -3,7 +3,7 @@ Description=Keyboard Backlight
 After=display-manager.service
 
 [Service]
-Type=simple
+Type=forking
 User=root
 ExecStart=/usr/bin/kbd-backlight default
 

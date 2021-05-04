@@ -29,76 +29,18 @@ int main(int argc, char *argv[])
 	strcpy(profile_ref, "profiles.");
 	strcat(profile_ref, argv[1]);
 
-	config_t conf;
-	config_setting_t *profile;
-	config_init(&conf);
-
-	if (!config_read_file(&conf, conf_path))
-	{
-		fprintf(stderr, "%s[✘]%s Cannot read config file: %s\n", RED, RST, conf_path);
-		config_destroy(&conf);
+	Segment_Conf *conf = mkfullconf(conf_path, profile_ref);
+	if (conf == nullptr) {
 		return EXIT_FAILURE;
 	}
 
-	profile = config_lookup(&conf, profile_ref);
+	char hid_dev[8] = {0};
+	findDevice(hid_dev);
 
-	if (profile != NULL)
-	{
-		int count = config_setting_length(profile);
+	writeConfig(hid_dev, conf);
+	printf("%s[✔]%s Loaded profile: %s\n", GRN, RST, argv[1]);
 
-		Segment_Conf *fullconf = (Segment_Conf *)malloc(sizeof(Segment_Conf) * count);
+	free(conf);
 
-		for (int i = 0; i < count; i++)
-		{
-			config_setting_t *seg = config_setting_get_elem(profile, i);
-			const char *mode;
-			const char *brightness;
-			const char *color;
-
-			if (!(config_setting_lookup_string(seg, "mode", &mode) && config_setting_lookup_string(seg, "brightness", &brightness) && config_setting_lookup_string(seg, "color", &color)))
-			{
-				fprintf(stderr, "%s[✘]%s Missing fields: index/color\n", RED, RST);
-				return EXIT_FAILURE;
-			}
-
-			Segment_Conf segment;
-
-			segment.index = i;
-
-			if (getMode(mode) == -1)
-			{
-				fprintf(stderr, "%s[✘]%s Invalid mode found: %s\n", RED, RST, mode);
-				return EXIT_FAILURE;
-			}
-			segment.mode = getMode(mode);
-
-			if (getBrightness(brightness) == -1)
-			{
-				fprintf(stderr, "%s[✘]%s Invalid brightness found: %s\n", RED, RST, brightness);
-				return EXIT_FAILURE;
-			}
-			segment.bright = getBrightness(brightness);
-
-			if (getColor(color) == -1)
-			{
-				fprintf(stderr, "%s[✘]%s Invalid color found: %s\n", RED, RST, color);
-				return EXIT_FAILURE;
-			}
-			segment.color = getColor(color);
-
-			fullconf[i] = segment;
-		}
-
-		char hid_dev[8] = {0};
-		findDevice(hid_dev);
-
-		writeConfig(hid_dev, fullconf);
-		printf("%s[✔]%s Loaded profile: %s\n", GRN, RST, argv[1]);
-
-		free(fullconf);
-
-		return EXIT_SUCCESS;
-	}
-	fprintf(stderr, "%s[✘]%s Cannot find profile: %s\n", RED, RST, argv[1]);
-	return EXIT_FAILURE;
+	return EXIT_SUCCESS;
 }

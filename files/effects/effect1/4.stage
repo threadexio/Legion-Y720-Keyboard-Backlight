@@ -1,0 +1,20 @@
+{
+	brightness = "HIGH";
+	color = "CRIMSON";
+	mode = "ALWAYS_ON";
+},
+{
+	brightness = "OFF";
+	color = "CRIMSON";
+	mode = "ALWAYS_ON";
+},
+{
+	brightness = "OFF";
+	color = "CRIMSON";
+	mode = "ALWAYS_ON";
+},
+{
+	brightness = "OFF";
+	color = "CRIMSON";
+	mode = "ALWAYS_ON";
+}

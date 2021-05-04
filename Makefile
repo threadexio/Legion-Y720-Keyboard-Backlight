@@ -2,30 +2,36 @@ CC = gcc
 CFLAGS = -Isrc -O2 -fPIC -pie -s
 LIBS = -lconfig
 
+CFG_DIR = /etc/kbd-backlight
+
+SOURCE = $(wildcard src/*.c)
 TARGET = kbd-backlight
 
-.PHONY: build install uninstall deps clean
+.PHONY: build
 build:
-	$(CC) src/main.c $(CFLAGS) $(LIBS) -o kbd-backlight
+	$(CC) $(SOURCE) $(CFLAGS) $(LIBS) -o kbd-backlight
 
+.PHONY: install
 install: build
+	# Install the main binary
 	install -Dm755 $(TARGET) /usr/bin/$(TARGET)
-	install -Dm644 backlight.conf /etc/kbd-backlight/backlight.conf
-	install -Dm644 backlight.service /etc/kbd-backlight/kbd-backlight.service
-	ln -s /etc/kbd-backlight/kbd-backlight.service /etc/systemd/system/kbd-backlight.service
+	
+	# Setup the config directory
+	mkdir -p $(CFG_DIR)
+	cp -r files/* /etc/kbd-backlight
+	ln $(CFG_DIR)/backlight.service /etc/systemd/system/kbd-backlight.service
 	systemctl daemon-reload
 	systemctl enable kbd-backlight
 	systemctl start kbd-backlight
 
+.PHONY: uninstall
 uninstall:
-	rm /usr/bin/$(TARGET)
-	systemctl disable kbd-backlight
-	systemctl stop kbd-backlight
-	unlink /etc/systemd/system/kbd-backlight.service
-	rm -drf /etc/kbd-backlight
+	-rm /usr/bin/$(TARGET)
+	-systemctl disable kbd-backlight
+	-rm /etc/systemd/system/kbd-backlight.service
+	-systemctl daemon-reload
+	-rm -drf $(CFG_DIR)
 
-deps:
-	@./install_deps.sh
-
+.PHONY: clean
 clean:
-	rm $(TARGET)
+	-rm -f $(TARGET)
