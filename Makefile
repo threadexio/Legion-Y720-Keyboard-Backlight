@@ -1,24 +1,45 @@
-CC = gcc
-CFLAGS = -Isrc -O2 -fPIC -pie -s
-LIBS = -lconfig
+CC := gcc
 
-CFG_DIR = /etc/kbd-backlight
+RLS_CFLAGS := -O2 -fPIC -fPIE -s
+DBG_CFLAGS := -D_DEBUG -g
 
-SOURCE = $(wildcard src/*.c)
-TARGET = kbd-backlight
+LFLAGS := -lconfig
 
-.PHONY: build
-build:
-	$(CC) $(SOURCE) $(CFLAGS) $(LIBS) -o kbd-backlight
+TARGET := kbd-backlight
+
+CFG_DIR := /etc/kbd-backlight
+SRC_DIR := src
+BUILD_DIR := build
+RLS_DIR := $(BUILD_DIR)/release
+DBG_DIR := $(BUILD_DIR)/debug
+
+SOURCE := $(wildcard $(SRC_DIR)/*.c)
+
+DBG_OBJ := $(patsubst $(SRC_DIR)/%.c,$(DBG_DIR)/%.o,$(SOURCE))
+RLS_OBJ := $(patsubst $(SRC_DIR)/%.c,$(RLS_DIR)/%.o,$(SOURCE))
+
+.PHONY: release
+release: $(RLS_OBJ)
+	$(CC) $(LFLAGS) $^ -o $(TARGET)
+
+$(RLS_DIR)/%.o: $(SRC_DIR)/%.c
+	$(CC) $(RLS_CFLAGS) -c $< -o $@
+
+.PHONY: debug
+debug: $(DBG_OBJ)
+	$(CC) $(LFLAGS) $^ -o $(TARGET)
+
+$(DBG_DIR)/%.o: $(SRC_DIR)/%.c
+	$(CC) $(DBG_CFLAGS) -c $< -o $@
 
 .PHONY: install
-install: build
+install: release
 	# Install the main binary
 	install -Dm755 $(TARGET) /usr/bin/$(TARGET)
 	
 	# Setup the config directory
 	mkdir -p $(CFG_DIR)
-	cp -r files/* /etc/kbd-backlight
+	cp -r files/* $(CFG_DIR)
 	ln $(CFG_DIR)/backlight.service /etc/systemd/system/kbd-backlight.service
 	systemctl daemon-reload
 	systemctl enable kbd-backlight
@@ -34,4 +55,4 @@ uninstall:
 
 .PHONY: clean
 clean:
-	-rm -f $(TARGET)
+	-rm -rf $(TARGET) $(DBG_DIR)/*.o $(RLS_DIR)/*.o

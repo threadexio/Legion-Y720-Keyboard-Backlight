@@ -1,1 +1,3 @@
 kbd-backlight
+*.log
+*.o
