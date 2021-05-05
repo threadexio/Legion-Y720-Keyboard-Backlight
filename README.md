@@ -6,6 +6,9 @@ Simple C program to control the keyboard backlight on the Lenovo Legion Y720 (sh
 
 It's literally [this](https://github.com/Izurii/Lenovo-Y720-KB-Led-Controller) but written in C without a GUI for the minimalists and purists
 
+## Supported features:
+- Unlimited profiles
+- Custom effects (coming soon!)
 
 ## Installation
 --------
@@ -15,11 +18,10 @@ cd /opt
 
 git clone https://github.com/threadexio/Legion-Y720-Keyboard-Backlight
 
-sudo make deps
-# This will automagically install the one dependency
+cd Legion-Y720-Keyboard-Backlight
 
 sudo make install
-# This will build and install the binary in /usr/bin and it's config file in /etc/kbd-backlight/backlight.conf
+# This will build and install the binary in /usr/bin and it's config files in /etc/kbd-backlight
 
 # Now you can edit the configuration file at /etc/kbd-backlight/backlight.conf and add as many profiles as you want
 ```
