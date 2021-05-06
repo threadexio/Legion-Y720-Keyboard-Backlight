@@ -8,7 +8,6 @@ It's literally [this](https://github.com/Izurii/Lenovo-Y720-KB-Led-Controller) b
 
 ## Supported features:
 - Unlimited profiles
-- Custom effects (coming soon!)
 
 ## Installation
 --------

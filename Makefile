@@ -1,6 +1,6 @@
 CC := gcc
 
-RLS_CFLAGS := -Wno-unused-result -O2 -fPIC -fPIE -s
+RLS_CFLAGS := -Wno-unused-result -O2 -fPIC -pie
 DBG_CFLAGS := -Wall -D_DEBUG -g
 
 LFLAGS := -lconfig
@@ -21,6 +21,7 @@ RLS_OBJ := $(patsubst $(SRC_DIR)/%.c,$(RLS_DIR)/%.o,$(SOURCE))
 .PHONY: release
 release: $(RLS_OBJ)
 	$(CC) $^ $(LFLAGS) -o $(TARGET)
+	strip $(TARGET)
 
 $(RLS_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) $(RLS_CFLAGS) -c $< -o $@

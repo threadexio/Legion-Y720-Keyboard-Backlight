@@ -3,6 +3,7 @@
 #include <libconfig.h>
 
 #define nullptr 0
+#define PATH_MAX 4096
 
 #define BLK "\e[0;30m"
 #define RED "\e[0;31m"
@@ -29,6 +30,9 @@ extern const char *bright[];
 
 extern const char *modes[];
 
+// Debug purposes only
+void PrintSegConf(Segment_Conf *config);
+
 int getColor(const char *color);
 
 int getBrightness(const char *brightness);
@@ -36,8 +40,3 @@ int getBrightness(const char *brightness);
 int getMode(const char *mode);
 
 Segment_Conf *mkfullconf(const char *conf_path, const char *ref);
-
-const char **include_func(config_t *config,
-								 const char *include_dir,
-								 const char *path,
-								 const char **error);

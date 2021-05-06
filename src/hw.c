@@ -1,23 +1,20 @@
-#include <sys/stat.h>
-#include <dirent.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
-
 #include "hw.h"
 
-void findDevice(char *dev)
-{
+#include <dirent.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+void findDevice(char *dev) {
 	memset(dev, 0, sizeof(*dev));
 	DIR *hidraw_d;
 	struct dirent *dir;
 	hidraw_d = opendir(HIDRAW_PATH);
-	if (hidraw_d)
-	{
+	if (hidraw_d) {
 		char buf[256];
-		while ((dir = readdir(hidraw_d)) != NULL)
-		{
+		while ((dir = readdir(hidraw_d)) != NULL) {
 			char path[256] = {0};
 			strcpy(path, HIDRAW_PATH);
 			strcat(path, dir->d_name);
@@ -26,8 +23,7 @@ void findDevice(char *dev)
 			if (!fd)
 				continue;
 			read(fd, buf, 256);
-			if (strstr(buf, HID_ID))
-			{
+			if (strstr(buf, HID_ID)) {
 				strcpy(dev, dir->d_name);
 				close(fd);
 				break;
@@ -37,14 +33,12 @@ void findDevice(char *dev)
 	}
 };
 
-int writeSegment(int dev_fd, Segment_Conf conf)
-{
+int writeSegment(int dev_fd, Segment_Conf conf) {
 	byte buf[WR_BUF_SIZE] = {204, 0, conf.mode, conf.color, conf.bright, conf.index};
 	return write(dev_fd, buf, WR_BUF_SIZE) == WR_BUF_SIZE;
 };
 
-void writeConfig(const char *dev, Segment_Conf conf[SEGNO])
-{
+void writeConfig(const char *dev, Segment_Conf conf[SEGNO]) {
 	char path[16] = {0};
 	strcpy(path, "/dev/");
 	strcat(path, dev);
