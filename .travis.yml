@@ -9,4 +9,4 @@ before_install:
   - sudo apt-get install -y libconfig-dev
 
 script:
-  - sudo make install
+  - sudo make release
