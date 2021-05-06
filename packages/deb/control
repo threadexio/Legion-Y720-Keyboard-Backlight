@@ -1,0 +1,10 @@
+Package: kbd-backlight
+Version: VERSION_NUMBER
+Section: utils
+Priority: optional
+Essential: no
+Depends: libconfig9
+Installed-Size: INSTALLED_SIZE
+Architecture: amd64
+Maintainer: threadexio <panos.z@outlook.com>
+Description: Simple C program to control the keyboard backlight on the Lenovo Legion Y720

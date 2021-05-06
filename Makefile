@@ -36,24 +36,35 @@ $(DBG_DIR)/%.o: $(SRC_DIR)/%.c
 .PHONY: install
 install: release
 	# Install the main binary
-	install -Dm755 $(TARGET) /usr/bin/$(TARGET)
+	install -Dm755 $(TARGET) $(DESTDIR)/usr/bin/$(TARGET)
 	
 	# Setup the config directory
 	mkdir -p $(CFG_DIR)
-	cp -r files/* $(CFG_DIR)
-	ln $(CFG_DIR)/backlight.service /etc/systemd/system/kbd-backlight.service
-	systemctl daemon-reload
-	systemctl enable kbd-backlight
-	systemctl start kbd-backlight
+	install -Dm644 files/backlight.conf $(DESTDIR)$(CFG_DIR)/backlight.conf
+	install -Dm644 files/backlight.service $(DESTDIR)/etc/systemd/system/kbd-backlight.service
+	-systemctl daemon-reload
+	-systemctl enable kbd-backlight
+	-systemctl start kbd-backlight
 
 .PHONY: uninstall
 uninstall:
-	-rm /usr/bin/$(TARGET)
+	-rm $(DESTDIR)/usr/bin/$(TARGET)
 	-systemctl disable kbd-backlight
-	-rm /etc/systemd/system/kbd-backlight.service
+	-rm $(DESTDIR)/etc/systemd/system/kbd-backlight.service
 	-systemctl daemon-reload
-	-rm -drf $(CFG_DIR)
+	-rm -drf $(DESTDIR)$(CFG_DIR)
 
 .PHONY: clean
 clean:
 	-rm -rf $(TARGET) $(DBG_DIR)/*.o $(RLS_DIR)/*.o
+
+# Build the deb package
+# make VERSION="x.x.x"
+.PHONY: deb
+deb:
+	cd packages/deb && \
+	docker build -t kbd-backlight .
+	docker run --rm -it \
+		-v $$PWD:/repo \
+		-e version=$(VERSION) \
+		kbd-backlight
