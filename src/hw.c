@@ -9,7 +9,7 @@
 
 void findDevice(char *dev) {
 	memset(dev, 0, sizeof(*dev));
-	DIR *hidraw_d;
+	DIR *		   hidraw_d;
 	struct dirent *dir;
 	hidraw_d = opendir(HIDRAW_PATH);
 	if (hidraw_d) {
@@ -20,7 +20,7 @@ void findDevice(char *dev) {
 			strcat(path, dir->d_name);
 			strcat(path, "/device/uevent");
 			int fd = open(path, O_RDONLY);
-			if (!fd)
+			if (! fd)
 				continue;
 			read(fd, buf, 256);
 			if (strstr(buf, HID_ID)) {
@@ -34,7 +34,8 @@ void findDevice(char *dev) {
 };
 
 int writeSegment(int dev_fd, Segment_Conf conf) {
-	byte buf[WR_BUF_SIZE] = {204, 0, conf.mode, conf.color, conf.bright, conf.index};
+	byte buf[WR_BUF_SIZE] = {
+		204, 0, conf.mode, conf.color, conf.bright, conf.index};
 	return write(dev_fd, buf, WR_BUF_SIZE) == WR_BUF_SIZE;
 };
 
@@ -46,8 +47,7 @@ void writeConfig(const char *dev, Segment_Conf conf[SEGNO]) {
 
 	byte final[WR_BUF_SIZE] = {204, 9, 0, 0, 0, 0};
 
-	for (int i = 0; i < SEGNO; i++)
-		writeSegment(dev_fd, conf[i]);
+	for (int i = 0; i < SEGNO; i++) writeSegment(dev_fd, conf[i]);
 
 	write(dev_fd, final, WR_BUF_SIZE);
 

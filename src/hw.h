@@ -4,7 +4,7 @@
 
 #define WR_BUF_SIZE 6
 #define HIDRAW_PATH "/sys/class/hidraw/"
-#define HID_ID "HID_NAME=ITE33D1:00 048D:837A"
+#define HID_ID		"HID_NAME=ITE33D1:00 048D:837A"
 
 #define SEGNO 4
 

@@ -7,9 +7,6 @@
 #include "hw.h"
 #include "utils.h"
 
-#define CONF_PATH_MAX_LEN 256
-#define CONF_REF_MAX_LEN 32
-
 #ifdef _DEBUG
 #define DEFAULT_CONF "files/backlight.conf"
 #else
@@ -19,28 +16,39 @@
 int main(int argc, char *argv[]) {
 	char conf_path[CONF_PATH_MAX_LEN + 1] = {0};
 	if (argc < 2) {
-		printf("Usage: %s%s%s [%sprofile name%s] {%sconfig file%s}\n", GRN, argv[0], RST, CYN, RST, YEL, RST);
+		printf("Usage: %s%s%s [%sprofile name%s] {%sconfig file%s}\n",
+			   GRN,
+			   argv[0],
+			   RST,
+			   CYN,
+			   RST,
+			   YEL,
+			   RST);
 		return EXIT_SUCCESS;
 	}
 
 #ifndef _DEBUG
 	if (geteuid() != 0) {
-		fprintf(stderr, "%s[✘]%s Run me as root, otherwise nothing will happen\n", RED, RST);
+		fprintf(stderr,
+				"%s[✘]%s Run me as root, otherwise nothing will happen\n",
+				RED,
+				RST);
 		return EXIT_FAILURE;
 	}
 #endif
 
 	const char *profile_name = argv[1];
-	const char *config_file = argv[2];
+	const char *config_file	 = argv[2];
 
 	snprintf(conf_path, CONF_PATH_MAX_LEN, DEFAULT_CONF);
 	if (config_file) {
 		snprintf(conf_path, CONF_PATH_MAX_LEN, config_file);
 	}
 
-	char ref[CONF_REF_MAX_LEN + 1] = {0};
-	const char *prefix = "profiles";
-	snprintf(ref, CONF_PATH_MAX_LEN, "%s.%s", prefix, profile_name);
+	char		ref[CONF_REF_MAX_LEN + 1];
+	memset(ref, '\0', CONF_REF_MAX_LEN + 1);
+	strcpy(ref, CONF_REF_PREFIX);
+	strncat(ref, profile_name, CONF_PROF_MAX_LEN);
 
 	Segment_Conf *conf = mkfullconf(conf_path, ref);
 	if (conf == nullptr) {
