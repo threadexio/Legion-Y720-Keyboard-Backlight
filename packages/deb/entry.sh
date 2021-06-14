@@ -1,31 +1,38 @@
 #!/usr/bin/bash
+set -e
 
-export arch="$(dpkg --print-architecture)"
+export pkg_base_dir="/repo/packages/deb"
+export pkg_file="${pkg_base_dir}/control"
 
-export pkg
-export rls
-if [ "$version" ]; then
-	rls="$version"
-	pkg="kbd-backlight_${version}_${arch}"
+# Get property from package file (control or spec file)
+get_property() {
+	grep "$1:" "$pkg_file" | awk '{print $NF}'
+}
+
+arch="$(dpkg --print-architecture)"
+name="$(get_property Package)"
+
+# Use version from V if its valid,
+# otherwise use commit id
+if [ "$v" ]; then
+	version="$v"
 else
-	commit_id="$(git rev-parse --short HEAD)"
-	rls="$commit_id"
-	pkg="kbd-backlight_${commit_id}_${arch}"
+	version="$(git rev-parse --short HEAD)"
 fi
 
-mkdir -p "/$pkg/DEBIAN"
+fullname="${name}_${version}_${arch}"
 
-make clean
-make DESTDIR="/$pkg" install
+mkdir -p "/tmp/$fullname/DEBIAN"
 
-export install_size="$(du -bc /$pkg | tail -n1 | awk '{print $1}')"
+make DESTDIR="/tmp/$fullname" clean install
 
-cd "/$pkg/DEBIAN"
-cp /repo/packages/deb/control .
-sed -i "s/VERSION_NUMBER/$rls/g" control
+cd "/tmp/$fullname/DEBIAN" || exit
+cp "$pkg_file" .
+sed -i "s/VERSION_NUMBER/$version/g" control
 sed -i "s/INSTALLED_SIZE/$install_size/g" control
 
-cd /repo/packages/deb/out
-dpkg-deb --build --root-owner-group "/$pkg"
-mv "/${pkg}.deb" .
+install_size="$(du -bc "/tmp/$fullname" | tail -n1 | awk '{print $1}')"
 
+cd "$pkg_base_dir/out" || exit
+dpkg-deb --build --root-owner-group "/tmp/$fullname"
+mv "/tmp/$fullname.deb" .

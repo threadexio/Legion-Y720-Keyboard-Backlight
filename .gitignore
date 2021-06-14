@@ -3,3 +3,4 @@ kbd-backlight
 *.o
 
 *.deb
+*.rpm
