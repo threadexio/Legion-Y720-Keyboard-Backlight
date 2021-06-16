@@ -64,6 +64,13 @@ int getMode(const char *mode) {
 	return -1;
 }
 
+bool fileExists(const char* file_path) {
+	if (access(file_path, F_OK) == -1) {
+		return 0;
+	}
+	return 1;
+}
+
 Segment_Conf *mkfullconf(const char *conf_path, char *ref) {
 	config_t		  conf;
 	config_setting_t *profile, *zones;
@@ -82,7 +89,7 @@ Segment_Conf *mkfullconf(const char *conf_path, char *ref) {
 	}
 
 	profile = config_lookup(&conf, ref);
-	strcat(ref, CONF_REF_SUFFIX);
+	strcat(ref, REF_SUFFIX);
 	zones = config_lookup(&conf, ref);
 
 	if (profile != NULL && zones != NULL) {

@@ -5,7 +5,11 @@
 #include <unistd.h>
 
 #include "hw.h"
+#include "user.h"
 #include "utils.h"
+
+#define CHOME_PATH ".config/kbd-backlight.conf"
+#define GROUP	   "kbd-backlight"
 
 #ifdef _DEBUG
 #define DEFAULT_CONF "files/backlight.conf"
@@ -14,7 +18,6 @@
 #endif
 
 int main(int argc, char *argv[]) {
-	char conf_path[CONF_PATH_MAX_LEN + 1] = {0};
 	if (argc < 2) {
 		printf("Usage: %s%s%s [%sprofile name%s] {%sconfig file%s}\n",
 			   GRN,
@@ -24,45 +27,56 @@ int main(int argc, char *argv[]) {
 			   RST,
 			   YEL,
 			   RST);
-		return EXIT_SUCCESS;
+		exit(EXIT_SUCCESS);
 	}
 
-#ifndef _DEBUG
-	if (geteuid() != 0) {
-		fprintf(stderr,
-				"%s[✘]%s Run me as root, otherwise nothing will happen\n",
-				RED,
-				RST);
-		return EXIT_FAILURE;
-	}
-#endif
+	const char *c_Pname		  = argv[1];
+	const char *c_AltConfPath = argv[2];
 
-	const char *profile_name = argv[1];
-	const char *config_file	 = argv[2];
+	char c_FinalConfPath[CPATH_MAX_LEN + 1] = {0};
 
-	snprintf(conf_path, CONF_PATH_MAX_LEN, DEFAULT_CONF);
-	if (config_file) {
-		snprintf(conf_path, CONF_PATH_MAX_LEN, config_file);
+	// Only allow members of GROUP and root to change the backlight
+	struct passwd pw = getUserPw();
+	if (! isUserInGroup(&pw, GROUP) && ! isUserRoot()) {
+		fprintf(stderr, "%s[✘]%s User not in the %s group\n", RED, RST, GROUP);
+		exit(EXIT_FAILURE);
 	}
 
-	char		ref[CONF_REF_MAX_LEN + 1];
-	memset(ref, '\0', CONF_REF_MAX_LEN + 1);
-	strcpy(ref, CONF_REF_PREFIX);
-	strncat(ref, profile_name, CONF_PROF_MAX_LEN);
+	// Another config file was specified from argv
+	if (c_AltConfPath) {
+		if (fileExists(c_AltConfPath))
+			snprintf(c_FinalConfPath, CPATH_MAX_LEN, c_AltConfPath);
+	} else {
+		// Check if ~/.config/kbd-backlight.conf exists
+		snprintf(
+			c_FinalConfPath, CPATH_MAX_LEN, "%s/%s", pw.pw_dir, CHOME_PATH);
+		if (! fileExists(c_FinalConfPath)) {
+			// If ~/.config/kbd-backlight.conf doesnt exist, fallback to
+			// DEFAULT_CONF
+			memset(c_FinalConfPath, '\0', CPATH_MAX_LEN + 1);
+			snprintf(c_FinalConfPath, CPATH_MAX_LEN, DEFAULT_CONF);
+		}
+	}
 
-	Segment_Conf *conf = mkfullconf(conf_path, ref);
+	char c_ProfileRef[REF_MAX_LEN + 1];
+	memset(c_ProfileRef, '\0', REF_MAX_LEN + 1);
+
+	strcpy(c_ProfileRef, REF_PREFIX);
+	strncat(c_ProfileRef, c_Pname, PNAME_MAX_LEN);
+
+	Segment_Conf *conf = mkfullconf(c_FinalConfPath, c_ProfileRef);
 	if (conf == nullptr) {
 		free(conf);
-		return EXIT_FAILURE;
+		exit(EXIT_FAILURE);
 	}
 
 	char hid_dev[8] = {0};
 	findDevice(hid_dev);
 
 	writeConfig(hid_dev, conf);
-	printf("%s[✔]%s Loaded profile: %s\n", GRN, RST, profile_name);
+	printf("%s[✔]%s Loaded profile: %s\n", GRN, RST, c_Pname);
 
 	free(conf);
 
-	return EXIT_SUCCESS;
+	exit(EXIT_SUCCESS);
 }

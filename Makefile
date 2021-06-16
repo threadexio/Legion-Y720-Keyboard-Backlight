@@ -8,6 +8,7 @@ LFLAGS := -lconfig
 
 TARGET := kbd-backlight
 
+GROUP := kbd-backlight
 CFG_DIR := /etc/kbd-backlight
 SRV_PATH := /usr/lib/systemd/system
 
@@ -44,8 +45,13 @@ install: all
 	# Install the main binary
 	install -Dm0755 $(RLS_DIR)/$(TARGET) $(DESTDIR)/usr/local/bin/$(TARGET)
 	
+	# Yes, this is probably the worst way to allow control without root perms
+	# if you find any other way please open an issue or a pull request
+	setcap cap_dac_override+eip /usr/local/bin/kbd-backlight
+	
 	install -Dm0644 files/backlight.conf $(DESTDIR)$(CFG_DIR)/backlight.conf
 	install -Dm0644 files/backlight.service $(DESTDIR)$(SRV_PATH)/kbd-backlight.service
+	groupadd $(GROUP)
 	-systemctl daemon-reload
 	-systemctl enable kbd-backlight
 	-systemctl start kbd-backlight
@@ -58,6 +64,7 @@ uninstall:
 	-rm $(DESTDIR)$(SRV_PATH)/kbd-backlight.service
 	-systemctl daemon-reload
 	-rm -drf $(DESTDIR)$(CFG_DIR)
+	-groupdel $(GROUP)
 
 .PHONY: test
 test:

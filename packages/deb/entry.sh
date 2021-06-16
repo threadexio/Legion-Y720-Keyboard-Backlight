@@ -2,7 +2,7 @@
 set -e
 
 export pkg_base_dir="/repo/packages/deb"
-export pkg_file="${pkg_base_dir}/control"
+export pkg_file="${pkg_base_dir}/DEBIAN/control"
 
 # Get property from package file (control or spec file)
 get_property() {
@@ -22,12 +22,13 @@ fi
 
 fullname="${name}_${version}_${arch}"
 
-mkdir -p "/tmp/$fullname/DEBIAN"
+#mkdir -p "/tmp/$fullname/DEBIAN"
 
 make DESTDIR="/tmp/$fullname" clean install
 
+cp -r "$pkg_base_dir/DEBIAN" "/tmp/$fullname"
 cd "/tmp/$fullname/DEBIAN" || exit
-cp "$pkg_file" .
+#cp "$pkg_file" .
 sed -i "s/VERSION_NUMBER/$version/g" control
 sed -i "s/INSTALLED_SIZE/$install_size/g" control
 

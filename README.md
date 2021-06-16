@@ -41,10 +41,13 @@ $ make
 ```bash
 $ sudo make install
 ...
+
+$ sudo gpasswd -a $USER kbd-backlight
 ```
 - Binary path is `/usr/local/bin/kbd-backlight`
 - Configuration path is `/etc/kbd-backlight/backlight.conf`
 
+**NOTE:** Any user that should be able to control the backlight should be added to the `kbd-backlight` group (`gpasswd -a [USER] kbd-backlight`)
 
 ## Usage
 --------
@@ -55,3 +58,9 @@ Usage: kbd-backlight [profile name] {config file}
 ```
 
 `{config file}`: Specify another location for the config file (Optional)
+
+Each user, who is in the `kbd-backlight` group, can now have their own personal config file with their own custom profiles. This config file must be manually created by the user with this command:
+```bash
+$ cp /etc/kbd-backlight/backlight.conf ~/.config/kbd-backlight.conf
+```
+The executable will automagically detect whether the user has their own config and load that instead of the system-wide one

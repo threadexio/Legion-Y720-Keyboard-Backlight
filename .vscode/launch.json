@@ -8,7 +8,7 @@
 			"name": "Debug project",
 			"type": "cppdbg",
 			"request": "launch",
-			"program": "${workspaceRoot}/kbd-backlight",
+			"program": "${workspaceRoot}/build/debug/kbd-backlight",
 			"args": [ "default" ],
 			"stopAtEntry": false,
 			"cwd": "${workspaceFolder}",
