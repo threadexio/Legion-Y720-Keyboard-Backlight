@@ -47,7 +47,7 @@ install: all
 	
 	# Yes, this is probably the worst way to allow control without root perms
 	# if you find any other way please open an issue or a pull request
-	setcap cap_dac_override+eip /usr/local/bin/kbd-backlight
+	setcap cap_dac_override+eip $(DESTDIR)/usr/local/bin/kbd-backlight
 	
 	install -Dm0644 files/backlight.conf $(DESTDIR)$(CFG_DIR)/backlight.conf
 	install -Dm0644 files/backlight.service $(DESTDIR)$(SRV_PATH)/kbd-backlight.service
