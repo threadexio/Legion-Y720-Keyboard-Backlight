@@ -5,7 +5,7 @@ After=display-manager.service
 [Service]
 Type=forking
 User=root
-ExecStart=/usr/bin/kbd-backlight default
+ExecStart=/usr/local/bin/kbd-backlight default
 
 [Install]
 WantedBy=multi-user.target

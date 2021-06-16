@@ -1,50 +1,57 @@
-# Legion-Y720-Keyboard-Backlight
-![GitHub](https://img.shields.io/github/license/threadexio/Legion-Y720-Keyboard-Backlight?style=for-the-badge)
-![Travis (.com)](https://img.shields.io/travis/com/threadexio/Legion-Y720-Keyboard-Backlight?style=for-the-badge)
+<div align="center">
+
+<h2>Legion-Y720-Keyboard-Backlight</h2>
+
+<hr>
+
+[![GitHub](https://img.shields.io/github/license/threadexio/Legion-Y720-Keyboard-Backlight?style=for-the-badge)](https://github.com/threadexio/Legion-Y720-Keyboard-Backlight/blob/master/LICENSE)
+[![Travis (.com)](https://img.shields.io/travis/com/threadexio/Legion-Y720-Keyboard-Backlight?style=for-the-badge)](https://travis-ci.com/github/threadexio/Legion-Y720-Keyboard-Backlight)
+[![Last commit](https://img.shields.io/github/last-commit/threadexio/Legion-Y720-Keyboard-Backlight/master?style=for-the-badge)](https://github.com/threadexio/Legion-Y720-Keyboard-Backlight/commits/master)
+[![Commits since latest](https://img.shields.io/github/commits-since/threadexio/Legion-Y720-Keyboard-Backlight/latest?style=for-the-badge)](https://github.com/threadexio/Legion-Y720-Keyboard-Backlight/commits/master)
+[![Downloads](https://img.shields.io/github/downloads/threadexio/Legion-Y720-Keyboard-Backlight/total?style=for-the-badge)](https://github.com/threadexio/Legion-Y720-Keyboard-Backlight/releases/latest)
+
+<hr>
+
+</div>
 
 Simple C program to control the keyboard backlight on the Lenovo Legion Y720 (should probably work on other laptops with the same keyboard)
 
 It's literally [this](https://github.com/Izurii/Lenovo-Y720-KB-Led-Controller) but written in C without a GUI for the minimalists and purists
 
-## Supported features:
+## Features
+<hr>
+
 - Unlimited profiles
+- Easy-ish configuration
+- No GUI (terminal ftw)
+- Written in C
 
-## Installation
---------
+## ➡ 🏗️ Build
+<hr>
+
 ```bash
-cd /opt
-# Or any other directory of your choice
-
-git clone https://github.com/threadexio/Legion-Y720-Keyboard-Backlight
-
-cd Legion-Y720-Keyboard-Backlight
-
-sudo make install
-# This will build and install the binary in /usr/bin and it's config files in /etc/kbd-backlight
-
-# Now you can edit the configuration file at /etc/kbd-backlight/backlight.conf and add as many profiles as you want
+$ make
+...
 ```
+- Binary can be found in `build/release/kbd-backlight`
+
+## ➡ ✨ Install
+<hr>
+
+```bash
+$ sudo make install
+...
+```
+- Binary path is `/usr/local/bin/kbd-backlight`
+- Configuration path is `/etc/kbd-backlight/backlight.conf`
+
 
 ## Usage
 --------
 ```bash
+$ kbd-backlight
+
 Usage: kbd-backlight [profile name] {config file}
 ```
 
-`profile name`: Name of the profile to use
-```bash
-profiles = {
-	// The format must be strictly followed
-	// you have to specify brightness and mode
-	// for every section due to the limitations
-	// of the current parsing method
-	example = (
-		/\          {
-	profile name        mode = "WAVE";
-		                brightness = "HIGH";
-		                color = "CRIMSON";
-		            },
-                    ...
-```
-
-`config file`: Path to an alternate location for the config
+`{config file}`: Specify another location for the config file (Optional)

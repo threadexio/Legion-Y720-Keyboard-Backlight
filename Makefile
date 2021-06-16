@@ -42,7 +42,7 @@ $(DBG_DIR)/%.o: $(SRC_DIR)/%.c
 .PHONY: install
 install: all
 	# Install the main binary
-	install -Dm0755 $(RLS_DIR)/$(TARGET) $(DESTDIR)/usr/bin/$(TARGET)
+	install -Dm0755 $(RLS_DIR)/$(TARGET) $(DESTDIR)/usr/local/bin/$(TARGET)
 	
 	install -Dm0644 files/backlight.conf $(DESTDIR)$(CFG_DIR)/backlight.conf
 	install -Dm0644 files/backlight.service $(DESTDIR)$(SRV_PATH)/kbd-backlight.service
@@ -52,7 +52,7 @@ install: all
 
 .PHONY: uninstall
 uninstall:
-	-rm $(DESTDIR)/usr/bin/$(TARGET)
+	-rm $(DESTDIR)/usr/local/bin/$(TARGET)
 	-systemctl stop kbd-backlight
 	-systemctl disable kbd-backlight
 	-rm $(DESTDIR)$(SRV_PATH)/kbd-backlight.service
