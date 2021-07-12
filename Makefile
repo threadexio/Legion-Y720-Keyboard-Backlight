@@ -10,6 +10,7 @@ TARGET := kbd-backlight
 
 GROUP := kbd-backlight
 CFG_DIR := /etc/kbd-backlight
+DEFAULT_CFG_DIR := /usr/share/kbd-backlight
 SRV_PATH := /usr/lib/systemd/system
 
 SRC_DIR := src
@@ -50,20 +51,26 @@ install: all
 	setcap cap_dac_override+eip $(DESTDIR)/usr/local/bin/kbd-backlight
 	
 	install -Dm0644 files/backlight.conf $(DESTDIR)$(CFG_DIR)/backlight.conf
+	install -Dm0644 files/backlight.conf $(DESTDIR)$(DEFAULT_CFG_DIR)/backlight.conf.default
 	install -Dm0644 files/backlight.service $(DESTDIR)$(SRV_PATH)/kbd-backlight.service
-	groupadd $(GROUP)
+	
 	-systemctl daemon-reload
 	-systemctl enable kbd-backlight
 	-systemctl start kbd-backlight
+	groupadd -r $(GROUP)
 
 .PHONY: uninstall
 uninstall:
-	-rm $(DESTDIR)/usr/local/bin/$(TARGET)
 	-systemctl stop kbd-backlight
 	-systemctl disable kbd-backlight
+	
+	-rm $(DESTDIR)/usr/local/bin/$(TARGET)
 	-rm $(DESTDIR)$(SRV_PATH)/kbd-backlight.service
+	
+	-rm -rf $(DESTDIR)$(CFG_DIR)
+	-rm -rf $(DESTDIR)$(DEFAULT_CFG_DIR)
+	
 	-systemctl daemon-reload
-	-rm -drf $(DESTDIR)$(CFG_DIR)
 	-groupdel $(GROUP)
 
 .PHONY: test
