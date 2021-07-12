@@ -1,5 +1,5 @@
 Package: kbd-backlight
-Version: VERSION_NUMBER
+Version: 1-VERSION_NUMBER
 Section: utils
 Priority: optional
 Essential: no

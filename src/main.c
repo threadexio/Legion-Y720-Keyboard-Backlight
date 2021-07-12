@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
 	// Another config file was specified from argv
 	if (c_AltConfPath) {
 		if (fileExists(c_AltConfPath))
-			snprintf(c_FinalConfPath, CPATH_MAX_LEN, c_AltConfPath);
+			snprintf(c_FinalConfPath, CPATH_MAX_LEN, "%s", c_AltConfPath);
 	} else {
 		// Check if ~/.config/kbd-backlight.conf exists
 		snprintf(
