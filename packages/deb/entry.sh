@@ -22,7 +22,7 @@ fi
 
 fullname="${name}_${version}_${arch}"
 
-make DESTDIR="/tmp/$fullname" clean install
+make DESTDIR="/tmp/$fullname" clean install apparmor
 
 cp -r "$pkg_base_dir/DEBIAN" "/tmp/$fullname"
 cd "/tmp/$fullname/DEBIAN" || exit

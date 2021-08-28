@@ -46,8 +46,6 @@ install: all
 	# Install the main binary
 	install -Dm0755 $(RLS_DIR)/$(TARGET) $(DESTDIR)/usr/local/bin/$(TARGET)
 	
-	# Yes, this is probably the worst way to allow control without root perms
-	# if you find any other way please open an issue or a pull request
 	setcap cap_dac_override+eip $(DESTDIR)/usr/local/bin/kbd-backlight
 	
 	install -Dm0644 files/backlight.conf $(DESTDIR)$(CFG_DIR)/backlight.conf
@@ -57,7 +55,11 @@ install: all
 	-systemctl daemon-reload
 	-systemctl enable kbd-backlight
 	-systemctl start kbd-backlight
-	groupadd -r $(GROUP)
+	-groupadd -r $(GROUP)
+
+.PHONY: apparmor
+apparmor:
+	install -Dm0644 files/apparmor.profile $(DESTDIR)/etc/apparmor.d/usr.local.bin.kbd-backlight
 
 .PHONY: uninstall
 uninstall:
@@ -66,7 +68,8 @@ uninstall:
 	
 	-rm $(DESTDIR)/usr/local/bin/$(TARGET)
 	-rm $(DESTDIR)$(SRV_PATH)/kbd-backlight.service
-	
+	-rm $(DESTDIR)/etc/apparmor.d/usr.local.bin.kbd-backlight
+
 	-rm -rf $(DESTDIR)$(CFG_DIR)
 	-rm -rf $(DESTDIR)$(DEFAULT_CFG_DIR)
 	

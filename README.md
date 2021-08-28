@@ -41,13 +41,20 @@ $ make
 ```bash
 $ sudo make install
 ...
-
-$ sudo gpasswd -a $USER kbd-backlight
 ```
 - Binary path is `/usr/local/bin/kbd-backlight`
 - Configuration path is `/etc/kbd-backlight/backlight.conf`
 
 **NOTE:** Any user that should be able to control the backlight should be added to the `kbd-backlight` group (`gpasswd -a [USER] kbd-backlight`)
+
+
+We now have an AppArmor profile for the binary, to install it do this instead of the above
+```bash
+$ sudo make install apparmor
+...
+
+$ sudo aa-enforce /etc/apparmor.d/usr.local.bin.kbd-backlight
+```
 
 ## Usage
 --------
