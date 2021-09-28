@@ -3,11 +3,8 @@ language: c
 os: linux
 dist: focal
 
-sudo: required
-
-before_install:
-  - sudo apt-get update -q
-  - sudo apt-get install -y libconfig-dev
+services:
+  - docker
 
 script:
-  - sudo make all install postinstall
+  - sudo make deb rpm
