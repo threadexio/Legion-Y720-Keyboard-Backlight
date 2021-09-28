@@ -1,100 +1,135 @@
-CROSS_COMPILE ?=
-CC := $(CROSS_COMPILE)gcc
+BANNER = \n\033[38;5;196m██\033[38;5;242m╗\033[0m     \033[38;5;196m███████\033[38;5;242m╗\033[0m \033[38;5;196m██████\033[38;5;242m╗\033[0m \033[38;5;196m██\033[38;5;242m╗\033[0m \033[38;5;196m██████\033[38;5;242m╗\033[0m \033[38;5;196m███\033[38;5;242m╗\033[0m   \033[38;5;196m██\033[38;5;242m╗\n\033[38;5;160m██\033[38;5;241m║\033[0m     \033[38;5;160m██\033[38;5;241m╔════╝\033[38;5;160m██\033[38;5;241m╔════╝\033[0m \033[38;5;160m██\033[38;5;241m║\033[38;5;160m██\033[38;5;241m╔═══\033[38;5;160m██\033[38;5;241m╗\033[38;5;160m████\033[38;5;241m╗\033[0m  \033[38;5;160m██\033[38;5;241m║\n\033[38;5;124m██\033[38;5;240m║\033[0m     \033[38;5;124m█████\033[38;5;240m╗\033[0m  \033[38;5;124m██\033[38;5;240m║\033[0m  \033[38;5;124m███\033[38;5;240m╗\033[38;5;124m██\033[38;5;240m║\033[38;5;124m██\033[38;5;240m║\033[0m   \033[38;5;124m██\033[38;5;240m║\033[38;5;124m██\033[38;5;240m╔\033[38;5;124m██\033[38;5;240m╗\033[0m \033[38;5;124m██\033[38;5;240m║\n\033[38;5;88m██\033[38;5;239m║\033[0m     \033[38;5;88m██\033[38;5;239m╔══╝\033[0m  \033[38;5;88m██\033[38;5;239m║\033[0m   \033[38;5;88m██\033[38;5;239m║\033[38;5;88m██\033[38;5;239m║\033[38;5;88m██\033[38;5;239m║\033[0m   \033[38;5;88m██\033[38;5;239m║\033[38;5;88m██\033[38;5;239m║╚\033[38;5;88m██\033[38;5;239m╗\033[38;5;88m██\033[38;5;239m║\n\033[38;5;52m███████\033[38;5;238m╗\033[38;5;52m███████\033[38;5;238m╗╚\033[38;5;52m██████\033[38;5;238m╔╝\033[38;5;52m██\033[38;5;238m║╚\033[38;5;52m██████\033[38;5;238m╔╝\033[38;5;52m██\033[38;5;238m║\033[0m \033[38;5;238m╚\033[38;5;52m████\033[38;5;238m║\n\033[38;5;237m╚══════╝╚══════╝\033[0m \033[38;5;237m╚═════╝\033[0m \033[38;5;237m╚═╝\033[0m \033[38;5;237m╚═════╝\033[0m \033[38;5;237m╚═╝\033[0m  \033[38;5;237m╚═══╝\n                                               \033[38;5;236m\n\033[38;5;196m██\033[38;5;242m╗\033[0m   \033[38;5;196m██\033[38;5;242m╗\033[38;5;196m███████\033[38;5;242m╗\033[38;5;196m██████\033[38;5;242m╗\033[0m  \033[38;5;196m██████\033[38;5;242m╗\033[0m     \033[38;5;196m██\033[38;5;242m╗\033[0m  \033[38;5;196m██\033[38;5;242m╗\033[38;5;196m██████\033[38;5;242m╗\033[0m \033[38;5;196m██████\033[38;5;242m╗\033[0m \033[38;5;242m\n\033[38;5;241m╚\033[38;5;160m██\033[38;5;241m╗\033[0m \033[38;5;160m██\033[38;5;241m╔╝╚════\033[38;5;160m██\033[38;5;241m║╚════\033[38;5;160m██\033[38;5;241m╗\033[38;5;160m██\033[38;5;241m╔═\033[38;5;160m████\033[38;5;241m╗\033[0m    \033[38;5;160m██\033[38;5;241m║\033[0m \033[38;5;160m██\033[38;5;241m╔╝\033[38;5;160m██\033[38;5;241m╔══\033[38;5;160m██\033[38;5;241m╗\033[38;5;160m██\033[38;5;241m╔══\033[38;5;160m██\033[38;5;241m╗\n \033[38;5;240m╚\033[38;5;124m████\033[38;5;240m╔╝\033[0m     \033[38;5;124m██\033[38;5;240m╔╝\033[0m \033[38;5;124m█████\033[38;5;240m╔╝\033[38;5;124m██\033[38;5;240m║\033[38;5;124m██\033[38;5;240m╔\033[38;5;124m██\033[38;5;240m║\033[0m    \033[38;5;124m█████\033[38;5;240m╔╝\033[0m \033[38;5;124m██████\033[38;5;240m╔╝\033[38;5;124m██\033[38;5;240m║\033[0m  \033[38;5;124m██\033[38;5;240m║\n  \033[38;5;239m╚\033[38;5;88m██\033[38;5;239m╔╝\033[0m     \033[38;5;88m██\033[38;5;239m╔╝\033[0m \033[38;5;88m██\033[38;5;239m╔═══╝\033[0m \033[38;5;88m████\033[38;5;239m╔╝\033[38;5;88m██\033[38;5;239m║\033[0m    \033[38;5;88m██\033[38;5;239m╔═\033[38;5;88m██\033[38;5;239m╗\033[0m \033[38;5;88m██\033[38;5;239m╔══\033[38;5;88m██\033[38;5;239m╗\033[38;5;88m██\033[38;5;239m║\033[0m  \033[38;5;88m██\033[38;5;239m║\n   \033[38;5;52m██\033[38;5;238m║\033[0m      \033[38;5;52m██\033[38;5;238m║\033[0m  \033[38;5;52m███████\033[38;5;238m╗╚\033[38;5;52m██████\033[38;5;238m╔╝\033[0m    \033[38;5;52m██\033[38;5;238m║\033[0m  \033[38;5;52m██\033[38;5;238m╗\033[38;5;52m██████\033[38;5;238m╔╝\033[38;5;52m██████\033[38;5;238m╔╝\n   \033[38;5;237m╚═╝\033[0m      \033[38;5;237m╚═╝\033[0m  \033[38;5;237m╚══════╝\033[0m \033[38;5;237m╚═════╝\033[0m     \033[38;5;237m╚═╝\033[0m  \033[38;5;237m╚═╝╚═════╝\033[0m \033[38;5;237m╚═════╝\033[0m \033[38;5;237m\n                                                              \033[38;5;236m\033[0m\n
 
-RLS_CFLAGS := -Wall -O3 -fPIC -fPIE
-DBG_CFLAGS := -Wall -D_DEBUG -g
+# ----------------- #
 
-LFLAGS := -lconfig
+NAME := kbd-backlight
+PREFIX ?= /usr/local
 
-TARGET := kbd-backlight
+SYSTEM_WIDE_CFG := /etc/$(NAME)
 
-GROUP := kbd-backlight
-CFG_DIR := /etc/kbd-backlight
-DEFAULT_CFG_DIR := /usr/share/kbd-backlight
-SRV_PATH := /usr/lib/systemd/system
+# ----------------- #
 
-SRC_DIR := src
-BUILD_DIR := build
-RLS_DIR := $(BUILD_DIR)/release
-DBG_DIR := $(BUILD_DIR)/debug
+SRCDIR := src
+INCLUDEDIR := .
+BUILDDIR := build
+TARGETDIR := $(BUILDDIR)/bin
+OBJDIR := $(BUILDDIR)/obj
 
-SOURCE := $(wildcard $(SRC_DIR)/*.c)
+SRCEXT := c
+OBJEXT := o
 
-DBG_OBJ := $(patsubst $(SRC_DIR)/%.c,$(DBG_DIR)/%.o,$(SOURCE))
-RLS_OBJ := $(patsubst $(SRC_DIR)/%.c,$(RLS_DIR)/%.o,$(SOURCE))
+SRCS := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
+OBJS := $(patsubst $(SRCDIR)/%.$(SRCEXT),$(OBJDIR)/%.$(OBJEXT),$(SRCS))
 
-.PHONY: all
-all: release
+# ----------------- #
 
-.PHONY: release
-release: $(RLS_OBJ)
-	$(CC) $^ $(LFLAGS) -o $(RLS_DIR)/$(TARGET)
-	strip $(RLS_DIR)/$(TARGET)
+TOOLCHAIN_PREFIX ?=
+CC ?= gcc
 
-$(RLS_DIR)/%.o: $(SRC_DIR)/%.c
-	$(CC) $(RLS_CFLAGS) -c $< -o $@
+C ?= $(TOOLCHAIN_PREFIX)$(CC)
 
-.PHONY: debug
-debug: $(DBG_OBJ)
-	$(CC) $^ $(LFLAGS) -o $(DBG_DIR)/$(TARGET)
+# Flags
+RFLAGS ?= -std=c18 -pipe
+WFLAGS ?= -Wall -Wextra
+OFLAGS ?= -O2
 
-$(DBG_DIR)/%.o: $(SRC_DIR)/%.c
-	$(CC) $(DBG_CFLAGS) -c $< -o $@
+LIBS := -lconfig
 
-.PHONY: install
-install: all
-	# Install the main binary
-	install -Dm0755 $(RLS_DIR)/$(TARGET) $(DESTDIR)/usr/local/bin/$(TARGET)
-	
-	setcap cap_dac_override+eip $(DESTDIR)/usr/local/bin/kbd-backlight
-	
-	install -Dm0644 files/backlight.conf $(DESTDIR)$(CFG_DIR)/backlight.conf
-	install -Dm0644 files/backlight.conf $(DESTDIR)$(DEFAULT_CFG_DIR)/backlight.conf.default
-	install -Dm0644 files/backlight.service $(DESTDIR)$(SRV_PATH)/kbd-backlight.service
-	
-	-systemctl daemon-reload
-	-systemctl enable kbd-backlight
-	-systemctl start kbd-backlight
-	-groupadd -r $(GROUP)
+INCLUDES := -I$(INCLUDEDIR) -I$(SRCDIR)
 
-.PHONY: apparmor
-apparmor:
-	install -Dm0644 files/apparmor.profile $(DESTDIR)/etc/apparmor.d/usr.local.bin.kbd-backlight
+CFLAGS := $(RFLAGS) $(WFLAGS) $(OFLAGS)
+LFLAGS ?= $(LIBS) -D_FORTIFY_SOURCE=2 -fstack-clash-protection -fstack-protector
 
-.PHONY: uninstall
-uninstall:
-	-systemctl stop kbd-backlight
-	-systemctl disable kbd-backlight
-	
-	-rm $(DESTDIR)/usr/local/bin/$(TARGET)
-	-rm $(DESTDIR)$(SRV_PATH)/kbd-backlight.service
-	-rm $(DESTDIR)/etc/apparmor.d/usr.local.bin.kbd-backlight
+ifeq ($(STATIC),y)
+	override CFLAGS += -static -static-libgcc
+endif
 
-	-rm -rf $(DESTDIR)$(CFG_DIR)
-	-rm -rf $(DESTDIR)$(DEFAULT_CFG_DIR)
-	
-	-systemctl daemon-reload
-	-groupdel $(GROUP)
+# ----------------- #
 
-.PHONY: test
-test:
-	# define custom actions here
+all: banner info setup build
 
-.PHONY: clean
+banner:
+	@printf "$(BANNER)\n"
+
+info:
+	@printf "          CC │ $(C)\n" 
+	@printf "   TOOLCHAIN │ $(TOOLCHAIN_PREFIX)\n"
+	@printf "      RFLAGS │ $(RFLAGS)\n"
+	@printf "      WFLAGS │ $(WFLAGS)\n"
+	@printf "      OFLAGS │ $(OFLAGS)\n"
+	@printf "        LIBS │ $(LIBS)\n"
+	@printf "      LFLAGS │ $(LFLAGS)\n"
+	@printf "      CFLAGS │ $(CFLAGS)\n"
+
+help: banner
+	@printf "Usage: make {variables} [recipe]\n"
+	@printf "\n"
+	@printf "Recipes:\n"
+	@printf "  all         │ Build\n"
+	@printf "  clean       │ Remove built object files\n"
+	@printf "  distclean   │ Remove built object files & binaries\n"
+	@printf "  install     │ Install the binary into \$$DESTDIR/\$$PREFIX\n"
+	@printf "  uninstall   │ Uninstall from \$$DESTDIR/\$$PREFIX\n"
+	@printf "  postinstall │ Post-installation stuff\n"
+
+setup:
+	@mkdir -p $(TARGETDIR)
+	@mkdir -p $(OBJDIR)
+
+build: $(OBJS)
+	@printf " -> $(TARGETDIR)/$(NAME)\n"
+	@$(C) $(LFLAGS) -o $(TARGETDIR)/$(NAME) $^
+
+$(OBJDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
+	@printf " -> $@\n"
+	@mkdir -p $(shell dirname $(@))
+	@$(C) $(CFLAGS) $(INCLUDES) -c -o $@ $<
+
 clean:
-	-rm -f $(DBG_DIR)/$(TARGET)* $(RLS_DIR)/$(TARGET)* $(DBG_DIR)/*.o $(RLS_DIR)/*.o
+	@printf "Removing: built object files...\n"
+	@rm -rf $(OBJDIR)
 
-.PHONY: setup_env
-setup_env:
-	-mkdir -p $(SRC_DIR) $(RLS_DIR) $(DBG_DIR)
-	-touch $(RLS_DIR)/.placeholder $(DBG_DIR)/.placeholder
+distclean: clean
+	@printf "Removing: built binaries...\n"
+	@rm -rf $(TARGETDIR)
+
+install: all
+	@printf "Installing binary to: $(DESTDIR)$(PREFIX)/bin/$(NAME)\n"
+	@install -Dm0755 $(TARGETDIR)/$(NAME) $(DESTDIR)$(PREFIX)/bin/$(NAME)
+	
+	@printf "Installing config to: $(DESTDIR)$(SYSTEM_WIDE_CFG)/backlight.conf\n"
+	@install -Dm0644 files/backlight.conf $(DESTDIR)$(SYSTEM_WIDE_CFG)/backlight.conf
+	
+	@printf "Installing default config to: $(DESTDIR)$(PREFIX)/share/$(NAME)/backlight.conf.default\n"
+	@install -Dm0644 files/backlight.conf $(DESTDIR)$(PREFIX)/share/$(NAME)/backlight.conf.default
+		
+uninstall:
+	@printf "Removing: $(DESTDIR)$(PREFIX)/bin/$(NAME)\n"
+	@rm -rf $(DESTDIR)$(PREFIX)/bin/$(NAME)
+
+	@printf "Removing: $(DESTDIR)$(SYSTEM_WIDE_CFG)\n"
+	@rm -rf $(DESTDIR)$(SYSTEM_WIDE_CFG)
+	
+	@printf "Removing: $(DESTDIR)$(PREFIX)/share/$(NAME)\n"
+	@rm -rf $(DESTDIR)$(PREFIX)/share/$(NAME)
+
+	@-rm -rf $(DESTDIR)/etc/apparmor.d/kbd-backlight
+
+postinstall: install
+	@printf "Adding capability: cap_dac_override\n"
+	@setcap cap_dac_override+eip $(DESTDIR)$(PREFIX)/bin/kbd-backlight
+
+	@printf "Adding group: $(NAME)\n"
+	@-groupadd -r "$(NAME)"
+
+apparmor:
+	@printf "Installing AppArmor profile...\n"
+	@install -Dm644 files/apparmor.profile $(DESTDIR)/etc/apparmor.d/kbd-backlight
 
 # Build the deb package
 # make V="x.x.x" deb
-.PHONY: deb
 deb:
-	cd packages/deb && \
-	docker build -t kbd-backlight-deb .
+	docker build -t kbd-backlight-deb packages/deb
 	docker run --rm -it \
 		-v $$PWD:/repo \
 		-e v=$(V) \
@@ -105,21 +140,15 @@ deb:
 # NOTE: We use --privileged because otherwise docker
 #		wont let us do bind mounts inside the container
 #		This is just so we dont cp the entire repo for no reason
-.PHONY: rpm
 rpm:
-	cd packages/rpm && \
-	docker build -t kbd-backlight-rpm .
+	docker build -t kbd-backlight-rpm packages/rpm
 	docker run --rm -it \
 		--privileged \
 		-v $$PWD:/repo \
 		-e v=$(V) \
 		kbd-backlight-rpm
-
-# Clean docker images used for building packages
-.PHONY: clean_docker
+	
 clean_docker:
-	-docker rmi kbd-backlight-deb kbd-backlight-rpm
+	docker rmi kbd-backlight-deb kbd-backlight-rpm
 
-.PHONY: clean_pkg
-clean_pkg:
-	-rm -f packages/deb/out/*.deb packages/rpm/out/*.rpm
+.PHONY: all banner info help setup build clean distclean install uninstall postinstall apparmor deb rpm

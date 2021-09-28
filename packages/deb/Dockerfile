@@ -1,4 +1,5 @@
-FROM debian
+# Aparently bullseye has a problem and can't link libconfig
+FROM debian:buster
 
 ENV DEBIAN_FRONTEND noninteractive
 

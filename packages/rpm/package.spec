@@ -22,18 +22,17 @@ Simple C program to control the keyboard backlight on the Lenovo Legion Y720
 /usr/bin/make
 
 %install
-%make_install
+%make_install PREFIX="/usr" distclean all install
 
 %post
-/sbin/groupadd %name
-/sbin/setcap cap_dac_override+eip /usr/local/bin/kbd-backlight
+/sbin/groupadd -r %name
+/sbin/setcap cap_dac_override+eip /usr/bin/kbd-backlight
 
 %postun
 /sbin/groupdel %name
 
 %files
 %license LICENSE
-/usr/local/bin/kbd-backlight
+/usr/bin/kbd-backlight
 /etc/kbd-backlight/backlight.conf
-/usr/lib/systemd/system/kbd-backlight.service
 /usr/share/kbd-backlight/backlight.conf.default

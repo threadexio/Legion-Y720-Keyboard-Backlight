@@ -39,5 +39,7 @@ release="$(rpm --eval "$(get_property Release)")"
 fullname="$name-$version-$release"
 
 cd ~/rpmbuild
+
+mkdir -p "$pkg_base_dir/out"
 cp "SRPMS/$fullname.src.rpm" "$pkg_base_dir/out"
 cp "RPMS/$arch/$fullname.$arch.rpm" "$pkg_base_dir/out"

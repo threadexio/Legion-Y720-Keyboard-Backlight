@@ -1,6 +1,6 @@
 #!/bin/bash
 
-/usr/sbin/groupadd kbd-backlight
+/usr/sbin/groupadd -r kbd-backlight
 /sbin/setcap cap_dac_override+eip /usr/local/bin/kbd-backlight
 
 exit 0

@@ -22,7 +22,7 @@ fi
 
 fullname="${name}_${version}_${arch}"
 
-make DESTDIR="/tmp/$fullname" clean install apparmor
+make PREFIX="/usr" DESTDIR="/tmp/$fullname" distclean all install apparmor
 
 cp -r "$pkg_base_dir/DEBIAN" "/tmp/$fullname"
 cd "/tmp/$fullname/DEBIAN" || exit
@@ -31,6 +31,8 @@ sed -i "s/INSTALLED_SIZE/$install_size/g" control
 
 install_size="$(du -bc "/tmp/$fullname" | tail -n1 | awk '{print $1}')"
 
-cd "$pkg_base_dir/out" || exit
+mkdir -p "$pkg_base_dir/out"
+cd "$pkg_base_dir/out"
+
 dpkg-deb --build --root-owner-group "/tmp/$fullname"
 mv "/tmp/$fullname.deb" .

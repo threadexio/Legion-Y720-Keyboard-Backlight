@@ -30,7 +30,7 @@ It's literally [this](https://github.com/Izurii/Lenovo-Y720-KB-Led-Controller) b
 <hr>
 
 ```bash
-$ make
+$ make all
 ...
 ```
 - Binary can be found in `build/release/kbd-backlight`
@@ -39,7 +39,7 @@ $ make
 <hr>
 
 ```bash
-$ sudo make install
+$ sudo make all install postinstall
 ...
 ```
 - Binary path is `/usr/local/bin/kbd-backlight`
@@ -48,12 +48,12 @@ $ sudo make install
 **NOTE:** Any user that should be able to control the backlight should be added to the `kbd-backlight` group (`gpasswd -a [USER] kbd-backlight`)
 
 
-We now have an AppArmor profile for the binary, to install it do this instead of the above
+We now have an AppArmor profile for the binary, to install it do this:
 ```bash
-$ sudo make install apparmor
+$ sudo make apparmor
 ...
 
-$ sudo aa-enforce /etc/apparmor.d/usr.local.bin.kbd-backlight
+$ sudo aa-enforce /etc/apparmor.d/kbd-backlight
 ```
 
 ## Usage

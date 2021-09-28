@@ -2,7 +2,7 @@
 
 include <tunables/global>
 
-"/usr/local/bin/kbd-backlight" {
+"/usr{/local,}/bin/kbd-backlight" {
   include <abstractions/base>
 
   capability dac_override,

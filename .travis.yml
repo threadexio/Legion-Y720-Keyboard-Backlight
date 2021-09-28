@@ -1,12 +1,13 @@
+language: c
+
+os: linux
 dist: focal
 
 sudo: required
-
-language: c
 
 before_install:
   - sudo apt-get update -q
   - sudo apt-get install -y libconfig-dev
 
 script:
-  - sudo make release
+  - sudo make all install postinstall
