@@ -1,10 +1,10 @@
 # Aparently bullseye has a problem and can't link libconfig
-FROM debian:buster
+FROM debian
 
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update
-RUN apt-get install --no-install-recommends -y libc-dev gcc make libconfig-dev git libcap2-bin
+RUN apt-get install --no-install-recommends -y build-essential libc-dev gcc make cmake libconfig-dev git libcap2-bin
 
 RUN mkdir -p /repo
 

@@ -1,6 +1,4 @@
-kbd-backlight
-*.log
-*.o
+/build
 
 *.deb
 *.rpm

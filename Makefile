@@ -5,40 +5,36 @@ BANNER = \n\033[38;5;196m██\033[38;5;242m╗\033[0m     \033[38;5;196m██
 NAME := kbd-backlight
 PREFIX ?= /usr/local
 
-SYSTEM_WIDE_CFG := /etc/$(NAME)
-
 # ----------------- #
 
-SRCDIR := src
-INCLUDEDIR := .
 BUILDDIR := build
-TARGETDIR := $(BUILDDIR)/bin
-OBJDIR := $(BUILDDIR)/obj
-
-SRCEXT := c
-OBJEXT := o
-
-SRCS := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
-OBJS := $(patsubst $(SRCDIR)/%.$(SRCEXT),$(OBJDIR)/%.$(OBJEXT),$(SRCS))
 
 # ----------------- #
 
 TOOLCHAIN_PREFIX ?=
 CC ?= gcc
 
-C ?= $(TOOLCHAIN_PREFIX)$(CC)
+C := $(TOOLCHAIN_PREFIX)$(CC)
 
-# Flags
-RFLAGS ?= -std=c18 -pipe
-WFLAGS ?= -Wall -Wextra
-OFLAGS ?= -O2
+# CMake Build Type ("Debug" or "Release")
+BUILD ?= Release
 
-LIBS := -lconfig
+# Release flags
+RFLAGS ?= -D_FORTIFY_SOURCE=2 -fstack-clash-protection -fstack-protector -O2
 
-INCLUDES := -I$(INCLUDEDIR) -I$(SRCDIR)
+# Debug flags
+DFLAGS ?= -Wall -Wextra
 
-CFLAGS := $(RFLAGS) $(WFLAGS) $(OFLAGS)
-LFLAGS ?= $(LIBS) -D_FORTIFY_SOURCE=2 -fstack-clash-protection -fstack-protector
+# Linker flags
+LFLAGS ?=
+
+CFLAGS :=
+
+ifeq ($(BUILD),Release)
+	override CFLAGS += $(RFLAGS)
+else ifeq ($(BUILD),Debug)
+	override CFLAGS += $(DFLAGS)
+endif
 
 ifeq ($(STATIC),y)
 	override CFLAGS += -static -static-libgcc
@@ -46,7 +42,7 @@ endif
 
 # ----------------- #
 
-all: banner info setup build
+all: banner info build
 
 banner:
 	@printf "$(BANNER)\n"
@@ -55,9 +51,8 @@ info:
 	@printf "          CC │ $(C)\n" 
 	@printf "   TOOLCHAIN │ $(TOOLCHAIN_PREFIX)\n"
 	@printf "      RFLAGS │ $(RFLAGS)\n"
-	@printf "      WFLAGS │ $(WFLAGS)\n"
+	@printf "      DFLAGS │ $(DFLAGS)\n"
 	@printf "      OFLAGS │ $(OFLAGS)\n"
-	@printf "        LIBS │ $(LIBS)\n"
 	@printf "      LFLAGS │ $(LFLAGS)\n"
 	@printf "      CFLAGS │ $(CFLAGS)\n"
 
@@ -65,7 +60,8 @@ help: banner
 	@printf "Usage: make {variables} [recipe]\n"
 	@printf "\n"
 	@printf "Recipes:\n"
-	@printf "  all         │ Build\n"
+	@printf "  all         │ clean && build release\n"
+	@printf "  build       | Build (Set BUILD for debug or release)\n"
 	@printf "  clean       │ Remove built object files\n"
 	@printf "  distclean   │ Remove built object files & binaries\n"
 	@printf "  install     │ Install the binary into \$$DESTDIR/\$$PREFIX\n"
@@ -73,32 +69,32 @@ help: banner
 	@printf "  postinstall │ Post-installation stuff\n"
 
 setup:
-	@mkdir -p $(TARGETDIR)
-	@mkdir -p $(OBJDIR)
+	@mkdir -p $(BUILDDIR)
 
-build: $(OBJS)
-	@printf " -> $(TARGETDIR)/$(NAME)\n"
-	@$(C) $(LFLAGS) -o $(TARGETDIR)/$(NAME) $^
+.ONESHELL:
+build: setup
+	@cd $(BUILDDIR)
+	@export CC="$(C)"
+	@export CFLAGS="$(CFLAGS)"
 
-$(OBJDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
-	@printf " -> $@\n"
-	@mkdir -p $(shell dirname $(@))
-	@$(C) $(CFLAGS) $(INCLUDES) -c -o $@ $<
+	cmake .. -DCMAKE_BUILD_TYPE="$(BUILD)"
+	
+	@make
 
 clean:
-	@printf "Removing: built object files...\n"
-	@rm -rf $(OBJDIR)
+	@printf "Cleaning build directory...\n"
+	cd $(BUILDDIR) && make clean
 
-distclean: clean
-	@printf "Removing: built binaries...\n"
-	@rm -rf $(TARGETDIR)
+distclean:
+	@printf "Removing build directory...\n"
+	@rm -rf $(BUILDDIR)
 
-install: all
+install:
 	@printf "Installing binary to: $(DESTDIR)$(PREFIX)/bin/$(NAME)\n"
-	@install -Dm0755 $(TARGETDIR)/$(NAME) $(DESTDIR)$(PREFIX)/bin/$(NAME)
+	@install -Dm0755 $(BUILDDIR)/$(NAME) $(DESTDIR)$(PREFIX)/bin/$(NAME)
 	
-	@printf "Installing config to: $(DESTDIR)$(SYSTEM_WIDE_CFG)/backlight.conf\n"
-	@install -Dm0644 files/backlight.conf $(DESTDIR)$(SYSTEM_WIDE_CFG)/backlight.conf
+	@printf "Installing config to: $(DESTDIR)/etc/$(NAME)/backlight.conf\n"
+	@install -Dm0644 files/backlight.conf $(DESTDIR)/etc/$(NAME)/backlight.conf
 	
 	@printf "Installing default config to: $(DESTDIR)$(PREFIX)/share/$(NAME)/backlight.conf.default\n"
 	@install -Dm0644 files/backlight.conf $(DESTDIR)$(PREFIX)/share/$(NAME)/backlight.conf.default
@@ -107,8 +103,8 @@ uninstall:
 	@printf "Removing: $(DESTDIR)$(PREFIX)/bin/$(NAME)\n"
 	@rm -rf $(DESTDIR)$(PREFIX)/bin/$(NAME)
 
-	@printf "Removing: $(DESTDIR)$(SYSTEM_WIDE_CFG)\n"
-	@rm -rf $(DESTDIR)$(SYSTEM_WIDE_CFG)
+	@printf "Removing: $(DESTDIR)/etc/$(NAME)\n"
+	@rm -rf $(DESTDIR)/etc/$(NAME)
 	
 	@printf "Removing: $(DESTDIR)$(PREFIX)/share/$(NAME)\n"
 	@rm -rf $(DESTDIR)$(PREFIX)/share/$(NAME)
