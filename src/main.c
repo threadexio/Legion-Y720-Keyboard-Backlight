@@ -1,82 +1,62 @@
-// https://github.com/threadexio/Legion-Y720-Keyboard-Backlight
-#include <libconfig.h>
+#include <linux/limits.h>
+#include <pwd.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
-#include "hw.h"
-#include "user.h"
-#include "utils.h"
-
-#define CHOME_PATH ".config/kbd-backlight.conf"
-#define GROUP	   "kbd-backlight"
+#include "config.h"
+#include "hardware.h"
+#include "log.h"
+#include "properties.h"
 
 #ifdef _DEBUG
-#define DEFAULT_CONF "files/backlight.conf"
+#define SYSTEM_CONF	  "files/backlight.conf"
+#define PERSONAL_CONF ".config/kbd-backlight.conf"
 #else
-#define DEFAULT_CONF "/etc/kbd-backlight/backlight.conf"
+#define SYSTEM_CONF	  "/etc/kbd-backlight/backlight.conf"
+#define PERSONAL_CONF ".config/kbd-backlight.conf"
 #endif
 
 int main(int argc, char *argv[]) {
 	if (argc < 2) {
-		printf("Usage: %s%s%s [%sprofile name%s] {%sconfig file%s}\n",
-			   GRN,
-			   argv[0],
-			   RST,
-			   CYN,
-			   RST,
-			   YEL,
-			   RST);
+		logd(stdout, "Usage: %s [profile name] {config file}\n", argv[0]);
 		exit(EXIT_SUCCESS);
 	}
+	const char *pname = argv[1];
 
-	const char *c_Pname		  = argv[1];
-	const char *c_AltConfPath = argv[2];
+	char conf_path[PATH_MAX + 1] = {0};
 
-	char c_FinalConfPath[CPATH_MAX_LEN + 1] = {0};
+	struct passwd *pw = getpwuid(getuid());
+	snprintf(conf_path, PATH_MAX, "%s/%s", pw->pw_dir, PERSONAL_CONF);
 
-	// Only allow members of GROUP and root to change the backlight
-	struct passwd pw = getUserPw();
-	if (! isUserInGroup(&pw, GROUP) && ! isUserRoot()) {
-		fprintf(stderr, "%s[✘]%s User not in the %s group\n", RED, RST, GROUP);
-		exit(EXIT_FAILURE);
-	}
-
-	// Another config file was specified from argv
-	if (c_AltConfPath) {
-		if (fileExists(c_AltConfPath))
-			snprintf(c_FinalConfPath, CPATH_MAX_LEN, "%s", c_AltConfPath);
-	} else {
-		// Check if ~/.config/kbd-backlight.conf exists
-		snprintf(
-			c_FinalConfPath, CPATH_MAX_LEN, "%s/%s", pw.pw_dir, CHOME_PATH);
-		if (! fileExists(c_FinalConfPath)) {
-			// If ~/.config/kbd-backlight.conf doesnt exist, fallback to
-			// DEFAULT_CONF
-			memset(c_FinalConfPath, '\0', CPATH_MAX_LEN + 1);
-			snprintf(c_FinalConfPath, CPATH_MAX_LEN, DEFAULT_CONF);
+	if (argc > 2) {
+		if (access(argv[2], F_OK) == 0) {
+			strncpy(conf_path, argv[2], PATH_MAX);
+		} else {
+			logd(stderr, LOG_CRIT "Cannot open config file at: %s\n", argv[2]);
+			exit(EXIT_FAILURE);
 		}
-	}
-
-	char c_ProfileRef[REF_MAX_LEN + 1];
-	memset(c_ProfileRef, '\0', REF_MAX_LEN + 1);
-
-	strcpy(c_ProfileRef, REF_PREFIX);
-	strncat(c_ProfileRef, c_Pname, PNAME_MAX_LEN);
-
-	Segment_Conf *conf = mkfullconf(c_FinalConfPath, c_ProfileRef);
-	if (conf == nullptr) {
-		free(conf);
+	} else if (access(conf_path, F_OK) == 0) {
+		// if we find the personal config dont do anything because
+		// its already in the buffer
+	} else if (access(SYSTEM_CONF, F_OK) == 0) {
+		strcpy(conf_path, SYSTEM_CONF);
+	} else {
+		logd(stderr, LOG_CRIT "Cannot find any config file\n");
 		exit(EXIT_FAILURE);
 	}
 
-	char hid_dev[8] = {0};
-	findDevice(hid_dev);
+	zone_t *zones;
+	if (read_config(conf_path, pname, zones) < 0)
+		exit(EXIT_FAILURE);
 
-	writeConfig(hid_dev, conf);
-	printf("%s[✔]%s Loaded profile: %s\n", GRN, RST, c_Pname);
+	char dev[16] = {0};
+	if (find_hidraw(dev) < 0)
+		exit(EXIT_FAILURE);
 
-	free(conf);
+	if (write_all(dev, zones) < 0)
+		exit(EXIT_FAILURE);
 
-	exit(EXIT_SUCCESS);
+	logd(stdout, LOG_SUCC "Loaded profile: %s\n", pname);
 }

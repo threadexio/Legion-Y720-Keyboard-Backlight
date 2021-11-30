@@ -76,8 +76,9 @@ build: setup
 	@cd $(BUILDDIR)
 	@export CC="$(C)"
 	@export CFLAGS="$(CFLAGS)"
+	@export LDFLAGS="$(LFLAGS)"
 
-	cmake .. -DCMAKE_BUILD_TYPE="$(BUILD)"
+	cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON -DCMAKE_BUILD_TYPE="$(BUILD)"
 	
 	@make
 
