@@ -17,13 +17,13 @@ CC ?= gcc
 C := $(TOOLCHAIN_PREFIX)$(CC)
 
 # CMake Build Type ("Debug" or "Release")
-BUILD ?= Release
+BUILD ?= Debug
 
 # Release flags
 RFLAGS ?= -D_FORTIFY_SOURCE=2 -fstack-clash-protection -fstack-protector -O2
 
 # Debug flags
-DFLAGS ?= -Wall -Wextra
+DFLAGS ?= -Wall -Wextra -D_DEBUG
 
 # Linker flags
 LFLAGS ?=
@@ -48,7 +48,7 @@ banner:
 	@printf "$(BANNER)\n"
 
 info:
-	@printf "          CC │ $(C)\n" 
+	@printf "          CC │ $(C)\n"
 	@printf "   TOOLCHAIN │ $(TOOLCHAIN_PREFIX)\n"
 	@printf "      RFLAGS │ $(RFLAGS)\n"
 	@printf "      DFLAGS │ $(DFLAGS)\n"
@@ -79,7 +79,7 @@ build: setup
 	@export LDFLAGS="$(LFLAGS)"
 
 	cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON -DCMAKE_BUILD_TYPE="$(BUILD)"
-	
+
 	@make
 
 clean:
@@ -93,20 +93,20 @@ distclean:
 install:
 	@printf "Installing binary to: $(DESTDIR)$(PREFIX)/bin/$(NAME)\n"
 	@install -Dm0755 $(BUILDDIR)/$(NAME) $(DESTDIR)$(PREFIX)/bin/$(NAME)
-	
+
 	@printf "Installing config to: $(DESTDIR)/etc/$(NAME)/backlight.conf\n"
 	@install -Dm0644 files/backlight.conf $(DESTDIR)/etc/$(NAME)/backlight.conf
-	
+
 	@printf "Installing default config to: $(DESTDIR)$(PREFIX)/share/$(NAME)/backlight.conf.default\n"
 	@install -Dm0644 files/backlight.conf $(DESTDIR)$(PREFIX)/share/$(NAME)/backlight.conf.default
-		
+
 uninstall:
 	@printf "Removing: $(DESTDIR)$(PREFIX)/bin/$(NAME)\n"
 	@rm -rf $(DESTDIR)$(PREFIX)/bin/$(NAME)
 
 	@printf "Removing: $(DESTDIR)/etc/$(NAME)\n"
 	@rm -rf $(DESTDIR)/etc/$(NAME)
-	
+
 	@printf "Removing: $(DESTDIR)$(PREFIX)/share/$(NAME)\n"
 	@rm -rf $(DESTDIR)$(PREFIX)/share/$(NAME)
 
@@ -144,7 +144,7 @@ rpm:
 		-v $$PWD:/repo \
 		-e v=$(V) \
 		kbd-backlight-rpm
-	
+
 clean_docker:
 	docker rmi kbd-backlight-deb kbd-backlight-rpm
 

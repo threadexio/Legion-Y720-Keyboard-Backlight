@@ -1,54 +1,64 @@
-#ifndef _SRC_PROPERTIES_H
-#define _SRC_PROPERTIES_H
+#pragma once
+#include <string.h>
 
-typedef struct prop_t {
-	const char* name;
-	int			value;
-} prop_t;
+#include "hardware.h"
 
-/**
- * @brief Array containing all the available colors.
- * @see properties.c
- */
-extern const prop_t colors[];
+#define SIZE(x) (sizeof(x) / sizeof(x[0]))
 
-/**
- * @brief Array containing all the available brightness values.
- * @see properties.c
- */
-extern const prop_t brightness[];
+#define LOOKUP(c)                                                              \
+	u8 c(const char* c) {                                                      \
+		for (int i = 0; i < SIZE(c##_table); i++) {                            \
+			if (strcmp(c##_table[i].key, c) == 0) {                            \
+				return c##_table[i].val;                                       \
+			}                                                                  \
+		}                                                                      \
+		return 0x0;                                                            \
+	}
 
-/**
- * @brief Array containing all the available modes.
- * @see properties.c
- */
-extern const prop_t modes[];
+typedef struct {
+	const char* key;
+	u8			val;
+} KV;
 
-/**
- * @brief Get color value from name.
- * @see colors
- *
- * @param x
- * @return int - The color value, or -1 if color doesn't exist
- */
-int color(const char* x);
+static KV color_table[] = {
+	{.key = "Crimson", .val = 0},
+	{.key = "Torch Red", .val = 1},
+	{.key = "Hollywood Cerise", .val = 2},
+	{.key = "Magent", .val = 3},
+	{.key = "Electric Violet", .val = 4},
+	{.key = "Electric Violet 2", .val = 5},
+	{.key = "Blue", .val = 6},
+	{.key = "Blue Ribbon", .val = 7},
+	{.key = "Azure Radiance", .val = 8},
+	{.key = "Cyan", .val = 9},
+	{.key = "Spring Green", .val = 10},
+	{.key = "Spring Green 2", .val = 11},
+	{.key = "Green", .val = 12},
+	{.key = "Bright Green", .val = 13},
+	{.key = "Lime", .val = 14},
+	{.key = "Yellow", .val = 15},
+	{.key = "Web Orange", .val = 16},
+	{.key = "International Orange", .val = 17},
+	{.key = "White", .val = 18},
+	{.key = "No Color", .val = 19},
+};
+LOOKUP(color);
 
-/**
- * @brief Get brightness value from name.
- * @see brightness
- *
- * @param x
- * @return int - The brightness value, or -1 if color doesn't exist
- */
-int bright(const char* x);
+static KV brightness_table[] = {
+	{.key = "Off", .val = 0},
+	{.key = "Low", .val = 1},
+	{.key = "Medium", .val = 2},
+	{.key = "High", .val = 3},
+	{.key = "Ultra", .val = 4},
+	{.key = "Enough", .val = 5},
+};
+LOOKUP(brightness);
 
-/**
- * @brief Get mode value from name.
- * @see modes
- *
- * @param x
- * @return int - The mode value, or -1 if color doesn't exist
- */
-int mode(const char* x);
-
-#endif
+static KV mode_table[] = {
+	{.key = "Heartbeat", .val = 0},
+	{.key = "Breath", .val = 1},
+	{.key = "Smooth", .val = 2},
+	{.key = "Always On", .val = 3},
+	{.key = "Wave", .val = 4},
+};
+LOOKUP(mode);

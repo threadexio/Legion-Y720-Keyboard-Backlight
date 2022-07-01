@@ -1,9 +1,6 @@
-#include <linux/limits.h>
 #include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
 
 #include "config.h"
 #include "hardware.h"
@@ -18,45 +15,64 @@
 #define PERSONAL_CONF ".config/kbd-backlight.conf"
 #endif
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
 	if (argc < 2) {
 		logd(stdout, "Usage: %s [profile name] {config file}\n", argv[0]);
 		exit(EXIT_SUCCESS);
 	}
-	const char *pname = argv[1];
 
-	char conf_path[PATH_MAX + 1] = {0};
+	zone_t zones[ZONE_NO];
 
-	struct passwd *pw = getpwuid(getuid());
-	snprintf(conf_path, PATH_MAX, "%s/%s", pw->pw_dir, PERSONAL_CONF);
+	const char* profile_name = argv[1];
 
-	if (argc > 2) {
-		if (access(argv[2], F_OK) == 0) {
-			strncpy(conf_path, argv[2], PATH_MAX);
-		} else {
-			logd(stderr, LOG_CRIT "Cannot open config file at: %s\n", argv[2]);
-			exit(EXIT_FAILURE);
+	char* conf_file = (char*)malloc(PATH_MAX);
+
+	if (argc < 3) {
+		struct passwd* pw = getpwuid(getuid());
+		snprintf(conf_file, PATH_MAX, "%s/%s", pw->pw_dir, PERSONAL_CONF);
+
+		if (access(conf_file, R_OK) < 0) {
+			snprintf(conf_file, PATH_MAX, SYSTEM_CONF);
+			if (access(conf_file, R_OK) < 0) {
+				logd(stderr, LOG_CRIT "Cannot find readable config file");
+				exit(1);
+			}
 		}
-	} else if (access(conf_path, F_OK) == 0) {
-		// if we find the personal config dont do anything because
-		// its already in the buffer
-	} else if (access(SYSTEM_CONF, F_OK) == 0) {
-		strcpy(conf_path, SYSTEM_CONF);
 	} else {
-		logd(stderr, LOG_CRIT "Cannot find any config file\n");
-		exit(EXIT_FAILURE);
+		snprintf(conf_file, PATH_MAX, "%s", argv[2]);
 	}
 
-	zone_t *zones;
-	if (read_config(conf_path, pname, zones) < 0)
-		exit(EXIT_FAILURE);
+	if (read_config(conf_file, profile_name, zones) < 0)
+		exit(1);
 
-	char dev[16] = {0};
-	if (find_hidraw(dev) < 0)
-		exit(EXIT_FAILURE);
+	free(conf_file);
 
-	if (write_all(dev, zones) < 0)
-		exit(EXIT_FAILURE);
+	int hidraw_fd = get_hidraw_dev();
+	if (hidraw_fd < 0) {
+		logd(stderr, LOG_CRIT "Cannot use hidraw device: %s", ERR);
+		exit(1);
+	}
 
-	logd(stdout, LOG_SUCC "Loaded profile: %s\n", pname);
+	for (int i = 0; i < ZONE_NO; i++) {
+		printf("color = %d, brightness = %d, mode = %d, index = %d\n",
+			   zones[i].color,
+			   zones[i].brightness,
+			   zones[i].mode,
+			   zones[i].index);
+
+		if (apply_zone(hidraw_fd, &zones[i]) < 0) {
+			logd(stderr,
+				 LOG_CRIT "Cannot apply zone %d: %s",
+				 zones[i].index,
+				 ERR);
+			exit(1);
+		}
+	}
+
+	if (apply_final(hidraw_fd) < 0) {
+		logd(stderr, LOG_CRIT "Cannot finish LED update: %s", ERR);
+		exit(1);
+	}
+
+	logd(stderr, LOG_SUCC "Loaded profile: %s", profile_name);
 }
