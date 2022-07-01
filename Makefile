@@ -23,7 +23,7 @@ BUILD ?= Debug
 RFLAGS ?= -D_FORTIFY_SOURCE=2 -fstack-clash-protection -fstack-protector -O2
 
 # Debug flags
-DFLAGS ?= -Wall -Wextra -D_DEBUG
+DFLAGS ?= -Wall -Wextra
 
 # Linker flags
 LFLAGS ?=

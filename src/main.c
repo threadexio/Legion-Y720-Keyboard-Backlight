@@ -7,13 +7,8 @@
 #include "log.h"
 #include "properties.h"
 
-#ifdef _DEBUG
-#define SYSTEM_CONF	  "files/backlight.conf"
-#define PERSONAL_CONF ".config/kbd-backlight.conf"
-#else
 #define SYSTEM_CONF	  "/etc/kbd-backlight/backlight.conf"
 #define PERSONAL_CONF ".config/kbd-backlight.conf"
-#endif
 
 int main(int argc, char* argv[]) {
 	if (argc < 2) {
@@ -29,12 +24,13 @@ int main(int argc, char* argv[]) {
 
 	if (argc < 3) {
 		struct passwd* pw = getpwuid(getuid());
-		snprintf(conf_file, PATH_MAX, "%s/%s", pw->pw_dir, PERSONAL_CONF);
 
+		snprintf(conf_file, PATH_MAX, "%s/%s", pw->pw_dir, PERSONAL_CONF);
 		if (access(conf_file, R_OK) < 0) {
 			snprintf(conf_file, PATH_MAX, SYSTEM_CONF);
 			if (access(conf_file, R_OK) < 0) {
 				logd(stderr, LOG_CRIT "Cannot find readable config file");
+				free(conf_file);
 				exit(1);
 			}
 		}
@@ -54,12 +50,6 @@ int main(int argc, char* argv[]) {
 	}
 
 	for (int i = 0; i < ZONE_NO; i++) {
-		printf("color = %d, brightness = %d, mode = %d, index = %d\n",
-			   zones[i].color,
-			   zones[i].brightness,
-			   zones[i].mode,
-			   zones[i].index);
-
 		if (apply_zone(hidraw_fd, &zones[i]) < 0) {
 			logd(stderr,
 				 LOG_CRIT "Cannot apply zone %d: %s",
