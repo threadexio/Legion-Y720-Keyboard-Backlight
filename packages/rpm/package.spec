@@ -1,38 +1,39 @@
-Name:           kbd-backlight
-Version:        VERSION_NUMBER
-Release:        1%{?dist}
-Summary:        Keyboard Backlight for the Legion Y720
+Name: kbd-backlight
+Version: VERSION_NUMBER
+Release: 1%{?dist}
+Summary: Keyboard backlight control for Lenovo Y720 laptop
+License: MIT
+URL: https://github.com/threadexio/Legion-Y720-Keyboard-Backlight
+Source0: %{name}-%{version}.tar.gz
+Source1: %{name}.sysusers
+BuildRequires: cmake
+BuildRequires: gcc-c++
+BuildRequires: libconfig-devel
+BuildRequires: systemd-rpm-macros
+Requires: libconfig
 
-License:        MIT
-URL:            https://github.com/threadexio/Legion-Y720-Keyboard-Backlight
-Source0:        %{name}-VERSION_NUMBER.tar.gz
-
-BuildRequires:  gcc gcc-c++ cmake make libconfig-devel
-Requires:		libconfig
+%global source_date_epoch_from_changelog 0
 
 %description
-Simple C program to control the keyboard backlight on the Lenovo Legion Y720 
-
-%global debug_package %{nil}
+A simple C program to control the keyboard backlight on the Lenovo Y720 laptop.
 
 %prep
-%setup -q
+%autosetup
 
 %build
-/usr/bin/make all
+%make_build all
 
 %install
 %make_install PREFIX="/usr" distclean all install
+install -p -D -m 0644 %{SOURCE1} %{buildroot}%{_sysusersdir}/%{name}.conf
 
-%post
-/sbin/groupadd -r %name
-/sbin/setcap cap_dac_override+eip /usr/bin/kbd-backlight
-
-%postun
-/sbin/groupdel %name
+%pre
+%sysusers_create_compat %{SOURCE1}
 
 %files
 %license LICENSE
-/usr/bin/kbd-backlight
-/etc/kbd-backlight/backlight.conf
-/usr/share/kbd-backlight/backlight.conf.default
+%dir %{_sysconfdir}/%{name}
+%config(noreplace) %attr(0664,-,%{name}) %{_sysconfdir}/%{name}/backlight.conf
+%caps(cap_dac_override+eip) %{_bindir}/%{name}
+%{_datadir}/%{name}
+%{_sysusersdir}/%{name}.conf
