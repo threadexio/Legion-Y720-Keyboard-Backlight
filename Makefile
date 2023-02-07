@@ -110,42 +110,39 @@ uninstall:
 	@printf "Removing: $(DESTDIR)$(PREFIX)/share/$(NAME)\n"
 	@rm -rf $(DESTDIR)$(PREFIX)/share/$(NAME)
 
-	@-rm -rf $(DESTDIR)/etc/apparmor.d/kbd-backlight
+	@printf "Removing: $(DESTDIR)/etc/apparmor.d/$(NAME)\n"
+	@-rm -rf $(DESTDIR)/etc/apparmor.d/$(NAME)
 
 postinstall: install
 	@printf "Adding capability: cap_dac_override\n"
-	@setcap cap_dac_override+eip $(DESTDIR)$(PREFIX)/bin/kbd-backlight
+	@setcap cap_dac_override+eip $(DESTDIR)$(PREFIX)/bin/$(NAME)
 
 	@printf "Adding group: $(NAME)\n"
 	@-groupadd -r "$(NAME)"
 
 apparmor:
 	@printf "Installing AppArmor profile...\n"
-	@install -Dm644 files/apparmor.profile $(DESTDIR)/etc/apparmor.d/kbd-backlight
+	@install -Dm644 files/apparmor.profile $(DESTDIR)/etc/apparmor.d/$(NAME)
 
 # Build the deb package
 # make V="x.x.x" deb
 deb:
-	docker build -t kbd-backlight-deb packages/deb
+	docker build -t $(NAME)-deb packages/deb
 	docker run --rm -it \
 		-v $$PWD:/repo \
 		-e v=$(V) \
-		kbd-backlight-deb
+		$(NAME)-deb
 
 # Build the rpm src and bin packages
 # make V="x.x.x" rpm
-# NOTE: We use --privileged because otherwise docker
-#		wont let us do bind mounts inside the container
-#		This is just so we dont cp the entire repo for no reason
 rpm:
-	docker build -t kbd-backlight-rpm packages/rpm
+	docker build -t $(NAME)-rpm packages/rpm
 	docker run --rm -it \
-		--privileged \
 		-v $$PWD:/repo \
 		-e v=$(V) \
-		kbd-backlight-rpm
+		$(NAME)-rpm
 
 clean_docker:
-	docker rmi kbd-backlight-deb kbd-backlight-rpm
+	docker rmi $(NAME)-deb $(NAME)-rpm
 
 .PHONY: all banner info help setup build clean distclean install uninstall postinstall apparmor deb rpm
