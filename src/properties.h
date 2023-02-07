@@ -7,7 +7,7 @@
 
 #define LOOKUP(c)                                                              \
 	u8 c(const char* c) {                                                      \
-		for (int i = 0; i < SIZE(c##_table); i++) {                            \
+		for (unsigned int i = 0; i < SIZE(c##_table); i++) {                            \
 			if (strcmp(c##_table[i].key, c) == 0) {                            \
 				return c##_table[i].val;                                       \
 			}                                                                  \
