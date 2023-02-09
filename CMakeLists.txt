@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(Legion-Y720-Keyboard-Backligh)
+project(Legion-Y720-Keyboard-Backligh C)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED YES)

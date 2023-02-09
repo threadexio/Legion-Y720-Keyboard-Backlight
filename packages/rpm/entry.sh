@@ -16,7 +16,7 @@ fullname="$name-$version-$release"
 git archive --format "tar.gz" --prefix "$name-$version/" \
 	-o "$HOME/rpmbuild/SOURCES/$name-$version.tar.gz" HEAD
 
-cp "${pkg_file%.spec}.sysusers" \
+cp "${pkg_base_dir}/../../files/sysusers.conf" \
 	"$HOME/rpmbuild/SOURCES/$name.sysusers"
 
 cd ~/rpmbuild/SPECS

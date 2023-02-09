@@ -111,7 +111,10 @@ uninstall:
 	@rm -rf $(DESTDIR)$(PREFIX)/share/$(NAME)
 
 	@printf "Removing: $(DESTDIR)/etc/apparmor.d/$(NAME)\n"
-	@-rm -rf $(DESTDIR)/etc/apparmor.d/$(NAME)
+	@rm -rf $(DESTDIR)/etc/apparmor.d/$(NAME)
+
+	@printf "Removing: $(DESTDIR)$(PREFIX)/lib/sysusers.d/$(NAME).conf\n"
+	@rm -rf $(DESTDIR)$(PREFIX)/lib/sysusers.d/$(NAME).conf
 
 postinstall: install
 	@printf "Adding capability: cap_dac_override\n"
@@ -123,6 +126,10 @@ postinstall: install
 apparmor:
 	@printf "Installing AppArmor profile...\n"
 	@install -Dm644 files/apparmor.profile $(DESTDIR)/etc/apparmor.d/$(NAME)
+
+sysusers:
+	@printf "Installing sysusers config...\n"
+	@install -Dm644 files/sysusers.conf $(DESTDIR)$(PREFIX)/lib/sysusers.d/$(NAME).conf
 
 # Build the deb package
 # make V="x.x.x" deb
@@ -145,4 +152,4 @@ rpm:
 clean_docker:
 	docker rmi $(NAME)-deb $(NAME)-rpm
 
-.PHONY: all banner info help setup build clean distclean install uninstall postinstall apparmor deb rpm
+.PHONY: all banner info help setup build clean distclean install uninstall postinstall apparmor sysusers deb rpm
