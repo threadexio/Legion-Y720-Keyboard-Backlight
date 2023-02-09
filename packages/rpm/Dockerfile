@@ -1,9 +1,9 @@
 FROM fedora
 
 RUN dnf -y update
-RUN dnf -y install rpm-build rpm-devel rpmlint \
-	rpmdevtools systemd-rpm-macros make cmake \
-	gcc gcc-c++ g++ libconfig libconfig-devel git
+RUN dnf -y install rpm-build rpmlint \
+	rpmdevtools systemd-rpm-macros gcc \
+	make cmake libconfig-devel git
 
 RUN rpmdev-setuptree
 

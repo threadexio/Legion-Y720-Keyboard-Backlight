@@ -6,8 +6,9 @@ License: MIT
 URL: https://github.com/threadexio/Legion-Y720-Keyboard-Backlight
 Source0: %{name}-%{version}.tar.gz
 Source1: %{name}.sysusers
+BuildRequires: make
 BuildRequires: cmake
-BuildRequires: gcc-c++
+BuildRequires: gcc
 BuildRequires: libconfig-devel
 BuildRequires: systemd-rpm-macros
 Requires: libconfig
@@ -24,8 +25,7 @@ A simple C program to control the keyboard backlight on the Lenovo Y720 laptop.
 %make_build all
 
 %install
-%make_install PREFIX="/usr" distclean all install
-install -p -D -m 0644 %{SOURCE1} %{buildroot}%{_sysusersdir}/%{name}.conf
+%make_install PREFIX="/usr" distclean all install sysusers
 
 %pre
 %sysusers_create_compat %{SOURCE1}
